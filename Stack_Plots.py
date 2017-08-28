@@ -98,44 +98,64 @@ after_lept[0].Scale(scale_list[0]/n_event[0]*2.2e3)
 mindphi_lept[0].Scale(scale_list[0]/n_event[0]*2.2e3)
 
 hs.Draw("hist")
-hs.GetXaxis().SetRangeUser(180, 820)
 hist_list[0].Draw("histsame")
 gPad.SetLogy()
 
+hs_max = hs.GetMaximum()
+if hist_list[0].GetMaximum() > hs_max:
+	hs_max = hist_list[0].GetMaximum()
+
+hs.SetMaximum(hs_max*1.1)
+
 stack1_leg.Draw("same")
 
-c1.Print(argv_list[0][:-5]+"_Hadronic_Stack_Pre_Selection.pdf")
+c1.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_Pre_Selection.pdf")
 
 c2.cd()
 
 hs2.Draw("hist")
-hs2.GetXaxis().SetRangeUser(180, 820)
 final_list[0].Draw("histsame")
 gPad.SetLogy()
 
+hs2_max = hs2.GetMaximum()
+if final_list[0].GetMaximum() > hs2_max:
+	hs2_max = final_list[0].GetMaximum()
+
+hs2.SetMaximum(hs2_max*1.1)
+
 stack2_leg.Draw("same")
 
-c2.Print(argv_list[0][:-5]+"_Hadronic_Stack_ Post_Selection.pdf")
+c2.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_ Post_Selection.pdf")
 
 
 c3.cd()
 
 hs3.Draw("hist")
-hs3.GetXaxis().SetRangeUser(180, 820)
 after_lept[0].Draw("histsame")
 gPad.SetLogy()
 
+hs3_max = hs3.GetMaximum()
+if after_lept[0].GetMaximum() > hs3_max:
+	hs3_max = after_lept[0].GetMaximum()
+
+hs3.SetMaximum(hs3_max*1.1)
+
 stack3_leg.Draw("same")
 
-c3.Print(argv_list[0][:-5]+"_Hadronic_Stack_After_Lepton.pdf")
+c3.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_After_Lepton.pdf")
 
 c4.cd()
 
 hs4.Draw("hist")
-hs4.GetXaxis().SetRangeUser(180, 820)
 mindphi_lept[0].Draw("histsame")
 gPad.SetLogy()
 
+hs4_max = hs4.GetMaximum()
+if mindphi_lept[0].GetMaximum() > hs4_max:
+	hs4_max = mindphi_lept[0].GetMaximum()
+
+hs4.SetMaximum(hs4_max*1.1)
+
 stack4_leg.Draw("same")
 
-c4.Print(argv_list[0][:-5]+"_Hadronic_Stack_Phi_After_Lepton.pdf")
+c4.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_Phi_After_Lepton.pdf")

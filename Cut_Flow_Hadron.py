@@ -51,4 +51,4 @@ gPad.SetLogy()
 
 stack1_leg.Draw("same")
 
-c1.Print(argv_list[0][:-5]+"_Hadronic_Cut_Flow.pdf")
+c1.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Cut_Flow.pdf")

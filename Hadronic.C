@@ -95,6 +95,7 @@ void Hadronic::Loop()
     Float_t top_phi = 0;
     Float_t antitop_phi = 0;
     Float_t top_pt = 0;    
+    Float_t antitop_pt = 0;
 
     Float_t dphi_tMET = 0;
     
@@ -116,25 +117,34 @@ void Hadronic::Loop()
       if(Particle_PID[j]==-6 && Particle_Status[j]==3 ) {
 	h_antitoppt->Fill(std::min(float(Particle_PT[j]), float(h_antitoppt->GetXaxis()->GetXmax()-0.1)), eventweight);
 	antitop_phi = Particle_Phi[j];
+	antitop_pt = Particle_PT[j];
       }
       
       if(abs(Particle_PID[j])==1000000 && Particle_Status[j]==3) {
 	h_medpt->Fill(std::min(float(Particle_PT[j]), float(h_medpt->GetXaxis()->GetXmax()-0.1)), eventweight);
 	met_test = float(Particle_PT[j]); 
       }
-      if(std::abs(Particle_PID[j]) == 11 && Particle_PT[j] > 10. && std::abs(Particle_Eta[j]<2.4)) {
-	//Increment number of electrons found in the events that satisfy the quality selection 
-      	n_lept += 1;
-      }
-
-      if(std::abs(Particle_PID[j]) == 13 && Particle_PT[j] > 10. && std::abs(Particle_Eta[j]<2.4)) {
-	//Increment number of muons found in the events that satisfy the quality selection 
-      	n_lept += 1;
-      }
     }
-    
+
+    //Loop over reconstructed electrons
+    for (Int_t k=0; k < Electron_size; k++){
+	if(Electron_PT[k]>10. && std::abs(Electron_Eta[k])>2.4 ) {
+	n_lept += 1;
+	}
+    }
+
+    //Loop over reconstructed electrons
+    for (Int_t m=0; m < Muon_size; m++){
+	if(Muon_PT[m]>10. && std::abs(Muon_Eta[m])>2.4 ) {
+	n_lept += 1;
+	}
+    }
+
     //Calculation of delta phi between the top quark and MET at gen level
-    dphi_tMET = std::abs(top_phi - GenMissingET_Phi[0]);
+    dphi_tMET = top_phi - GenMissingET_Phi[0];
+    while (dphi_tMET > M_PI) dphi_tMET -= 2*M_PI;
+    while (dphi_tMET <= -M_PI) dphi_tMET += 2*M_PI;  
+    dphi_tMET = std::abs(dphi_tMET); 
         
     //Example of selection applied to the jets
     //Loop over reconstructed jets 
@@ -149,21 +159,20 @@ void Hadronic::Loop()
 	//Note that jets the jet array in the tree are ordered as a function of pt, 
 	//i.e. the first element of the array is the jet in the event with the highest pt
 	if(index_j1==-1) index_j1=i;
-	
-      }
-      if(std::abs(Jet_Eta[i])<4. && Jet_PT[i]>30 && Jet_BTag[i]>=1) {
+
+	if( std::abs(Jet_Eta[i])<2.4 && std::abs(Jet_BTag[i]==1) ) {
       	//Increment number of jets found in the events that satisfy the quality selection 
       	n_bjet += 1;
 	
       	//Keep track of the index of the first bjet that satisfy the requirement for later
       	if(index_bj1==-1) index_bj1=i;
+        }
+	
       }
+      
     }
-    for (Int_t i=0; i < 6; i++){
-	if( (std::abs(Jet_Phi[i]-MissingET_Phi[0]) > 1.) ) sum_jetphi += 1;
-	
+    for (Int_t i=0; i < 6; i++){	
 	if( (std::abs(Jet_Phi[i]-MissingET_Phi[0]) < min_dphi) ) min_dphi = std::abs(Jet_Phi[i]-MissingET_Phi[0]);
-	
     }
 
     //Fill histograms - no selection
@@ -199,7 +208,7 @@ void Hadronic::Loop()
     h_met->Fill(std::min(float(met), float(h_met->GetXaxis()->GetXmax()-0.1)), eventweight);
 
     //Fill histograms - mindphi selection
-    if( !(sum_jetphi > 5.) ) continue;
+    if( !(min_dphi > 1.) ) continue;
     //printf("%f\n", sum_jetphi);
 
     h_events->Fill(4., eventweight);
