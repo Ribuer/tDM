@@ -60,11 +60,11 @@ void Hadronic::Loop()
   TH1F *h_mindphi = new TH1F("mindphi",";MinDPhi;Events / (40 GeV);log",30,0,1200); h_mindphi->Sumw2();
   TH1F *h_mindphi_val = new TH1F("mindphi_val",";MinDPhi;Events / 0.2;log",20,0,4); h_mindphi_val->Sumw2();
 
-  TH2F *h_met_topdphi = new TH2F("met_topdphi","", 35, 0, 7, 25, 0, 500); h_met_topdphi->Sumw2();
+  TH2F *h_met_topdphi = new TH2F("met_topdphi","", 17, 0, 3.4, 25, 0, 500); h_met_topdphi->Sumw2();
   TH2F *h_met_jet1pt = new TH2F("met_jet1pt", "", 35, 0, 700, 25, 0, 500); h_met_jet1pt->Sumw2();
   TH2F *h_met_bjet1pt = new TH2F("met_bjet1pt", "", 35, 0, 700, 25, 0, 500); h_met_bjet1pt->Sumw2();
   TH2F *h_toppt_bjet1pt = new TH2F("toppt_bjet1pt ", "", 35, 0, 700, 25, 0, 500); h_toppt_bjet1pt->Sumw2();
-  TH2F *h_topphi_bjet1phi = new TH2F("topphi_bjet1phi  ", "", 20, 0, 4, 20, 0, 4); h_topphi_bjet1phi->Sumw2();
+  TH2F *h_topphi_bjet1phi = new TH2F("topphi_bjet1phi  ", "", 17, 0, 3.4, 17, 0, 3.4); h_topphi_bjet1phi->Sumw2();
 
 
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -81,12 +81,10 @@ void Hadronic::Loop()
     Int_t n_jet = 0;
     Int_t n_bjet = 0;
     Int_t n_lept = 0;
-    Float_t sum_jetphi = 0;
     
     Int_t index_j1 = -1;
     Int_t index_bj1 = -1;
-    
-    Float_t min_dphi = 1000;
+
     Float_t dphi = 0;
     Float_t dphi_jet = 0;
     
@@ -97,7 +95,9 @@ void Hadronic::Loop()
     Float_t top_pt = 0;    
     Float_t antitop_pt = 0;
 
-    Float_t dphi_tMET = 0;
+    Float_t dphi_tMET = 0;    
+    Float_t min_dphi = 1000;
+    Float_t min_dphi1 = 0;
     
     met =  MissingET_MET[0];
     
@@ -127,15 +127,20 @@ void Hadronic::Loop()
     }
 
     //Loop over reconstructed electrons
-    for (Int_t k=0; k < Electron_size; k++){
-	if(Electron_PT[k]>10. && std::abs(Electron_Eta[k])>2.4 ) {
-	n_lept += 1;
+    if( (sample.substr(0,3) == "ttD") ) {
+	for (Int_t k=0; k < Electron_size; k++){
+		if( (Electron_PT[k]>10. && std::abs(Electron_Eta[k])<2.5) ) n_lept += 1;
 	}
     }
+    else {
+	for (Int_t k=0; k < Electron_size; k++){
+		if( (Electron_PT[k]>10. && std::abs(Electron_Eta[k])<2.4) ) n_lept += 1;	    
+        }
+    }
 
-    //Loop over reconstructed electrons
+    //Loop over reconstructed muons
     for (Int_t m=0; m < Muon_size; m++){
-	if(Muon_PT[m]>10. && std::abs(Muon_Eta[m])>2.4 ) {
+	if(Muon_PT[m]>10. && std::abs(Muon_Eta[m])<2.4 ) {
 	n_lept += 1;
 	}
     }
@@ -171,9 +176,18 @@ void Hadronic::Loop()
       }
       
     }
-    for (Int_t i=0; i < 6; i++){	
-	if( (std::abs(Jet_Phi[i]-MissingET_Phi[0]) < min_dphi) ) min_dphi = std::abs(Jet_Phi[i]-MissingET_Phi[0]);
+    for (Int_t i=0; i < 6; i++){
+	//if( (std::abs(Jet_Phi[i]-MissingET_Phi[0]) < min_dphi) ) min_dphi = std::abs(Jet_Phi[i]-MissingET_Phi[0]);
+	
+	min_dphi1 = Jet_Phi[i] - MissingET_Phi[0];
+	while (min_dphi1 > M_PI) min_dphi1 -= 2*M_PI;
+	while (min_dphi1 <= -M_PI) min_dphi1 += 2*M_PI;  
+	min_dphi1 = std::abs(min_dphi1); 
+	if( (min_dphi1 < min_dphi) ) min_dphi = min_dphi1;
     }
+
+    //printf("%f\n", min_dphi1);
+    //printf("%f\n", min_dphi);
 
     //Fill histograms - no selection
     h_events->Fill(0., eventweight);
@@ -191,7 +205,7 @@ void Hadronic::Loop()
 
     h_events->Fill(1., eventweight);
     h_leptons->Fill(std::min(float(met), float(h_leptons->GetXaxis()->GetXmax()-0.1)), eventweight);
-    h_mindphi_val->Fill(std::min(float(min_dphi), float(h_mindphi->GetXaxis()->GetXmax()-0.1)), eventweight);
+    h_mindphi_val->Fill(std::min(float(min_dphi), float(h_mindphi_val->GetXaxis()->GetXmax()-0.1)), eventweight);
 
     //Fill histograms - #jets selection
     if( !(n_jet > 3) ) continue;
@@ -209,7 +223,6 @@ void Hadronic::Loop()
 
     //Fill histograms - mindphi selection
     if( !(min_dphi > 1.) ) continue;
-    //printf("%f\n", sum_jetphi);
 
     h_events->Fill(4., eventweight);
     h_mindphi->Fill(std::min(float(met), float(h_mindphi->GetXaxis()->GetXmax()-0.1)), eventweight);

@@ -69,9 +69,9 @@ def print_tt(file_name, hist1, hist2, hist3, hist4, hist5):
 	hist5.SetTitle(file_name[0:4]+" "+file_name[5:-5]+" Hadronic "+axis_labelling[4])
 	hist5.GetXaxis().SetTitleOffset(1.2)
 	hist5.GetYaxis().SetTitleOffset(1.2)
-	hist4.GetZaxis().SetTickSize(.01)
+	hist5.GetZaxis().SetTickSize(.01)
 	c1.Update()	
-	palette = hist4.GetListOfFunctions().FindObject("palette")
+	palette = hist5.GetListOfFunctions().FindObject("palette")
 	palette.SetX2NDC(.93)
 	c1.Print("./images/"+file_name[:-5]+"_Hadronic_"+output_name[4]+".pdf")
 
@@ -103,6 +103,7 @@ print_tt(argv_list[4], top_rec_hist[0], top_rec_hist[1], top_rec_hist[2], top_re
 for m in range(0, len(top_rec_hist)):
 	hist_list[0][m].Draw("colz")
 	hist_list[0][m].Divide(top_rec_hist[m])
+	hist_list[0][m].Scale(1./hist_list[0][m].Integral())
 	hist_list[0][m].SetTitle(title_labelling+axis_labelling[m])
-	c1.Print("./images/Ratio_Hadronic_"+output_name[m]+".pdf")
+	c1.Print("./images/"+argv_list[0][5:-5]+"_Ratio_Hadronic_"+output_name[m]+".pdf")
 

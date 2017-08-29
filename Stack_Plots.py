@@ -109,7 +109,7 @@ hs.SetMaximum(hs_max*1.1)
 
 stack1_leg.Draw("same")
 
-c1.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_Pre_Selection.pdf")
+c1.Print("./images/"+argv_list[0][5:-5]+"_Hadronic_Stack_Pre_Selection.pdf")
 
 c2.cd()
 
@@ -125,7 +125,7 @@ hs2.SetMaximum(hs2_max*1.1)
 
 stack2_leg.Draw("same")
 
-c2.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_ Post_Selection.pdf")
+c2.Print("./images/"+argv_list[0][5:-5]+"_Hadronic_Stack_ Post_Selection.pdf")
 
 
 c3.cd()
@@ -142,7 +142,7 @@ hs3.SetMaximum(hs3_max*1.1)
 
 stack3_leg.Draw("same")
 
-c3.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_After_Lepton.pdf")
+c3.Print("./images/"+argv_list[0][5:-5]+"_Hadronic_Stack_After_Lepton.pdf")
 
 c4.cd()
 
@@ -158,4 +158,4 @@ hs4.SetMaximum(hs4_max*1.1)
 
 stack4_leg.Draw("same")
 
-c4.Print("./images/"+argv_list[0][:-5]+"_Hadronic_Stack_Phi_After_Lepton.pdf")
+c4.Print("./images/"+argv_list[0][5:-5]+"_Hadronic_Stack_Phi_After_Lepton.pdf")
