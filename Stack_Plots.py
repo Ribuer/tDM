@@ -10,21 +10,26 @@ c1 = TCanvas("canvas1", "Test", 800, 600)
 c2 = TCanvas("canvas2", "Test", 800, 600)
 c3 = TCanvas("canvas3", "Test", 800, 600)
 c4 = TCanvas("canvas4", "Test", 800, 600)
+c5 = TCanvas("canvas5", "Test", 800, 600)
+
 pad_thresh = .2325
 up_pad1 = TPad("upperPad1", "Name", .005, pad_thresh, .995, .995)
-low_pad1 = TPad("lowerPad1", "Name", .005, .08, .995, pad_thresh+.07)
+low_pad1 = TPad("lowerPad1", "Name", .005, .005, .995, pad_thresh+.07)
 up_pad2 = TPad("upperPad2", "Name", .005, pad_thresh, .995, .995)
-low_pad2 = TPad("lowerPad2", "Name", .005, .08, .995, pad_thresh+.07)
+low_pad2 = TPad("lowerPad2", "Name", .005, .005, .995, pad_thresh+.07)
 up_pad3 = TPad("upperPad3", "Name", .005, pad_thresh, .995, .995)
-low_pad3 = TPad("lowerPad3", "Name", .005, .08, .995, pad_thresh+.07)
+low_pad3 = TPad("lowerPad3", "Name", .005, .005, .995, pad_thresh+.07)
 up_pad4 = TPad("upperPad4", "Name", .005, pad_thresh, .995, .995)
 low_pad4 = TPad("lowerPad4", "Name", .005, .005, .995, pad_thresh+.07)
+up_pad5 = TPad("upperPad5", "Name", .005, pad_thresh, .995, .995)
+low_pad5 = TPad("lowerPad5", "Name", .005, .005, .995, pad_thresh+.07)
 
 hist_list = [0, 0, 0, 0]
 file_list = [0, 0, 0, 0]
 final_list = [0, 0, 0, 0]
 after_lept = [0, 0, 0, 0]
 mindphi_lept = [0, 0, 0, 0]
+bjeteta_list = [0, 0, 0, 0]
 scale_dict = {"ttDM_Mchi1Mphi10": 19.76, "topDM_Mchi1Mphi10_sChan_4F": 7.03e-2, "topDM_Mchi1Mphi10_tChan_4F": 27.18e-1, "topDM_Mchi1Mphi10_tWChan_5F": 73.25e-2}
 name_list = ["ttDM", "s-Chan", "t-Chan", "tW-Chan"]
 argv_list = [sys.argv[1], 0, 0, 0]
@@ -57,10 +62,14 @@ for j in range(0, len(hist_list)):
 	mindphi_lept[j] = mindphi_val.Clone()
 	del mindphi_val
 
-hs = THStack("hs",level+title+" before selection; #slash{E}_{T} (GeV); Events / 40 GeV")
-hs2 = THStack("hs2",level+title+" after selection; #slash{E}_{T} (GeV); Events / 40 GeV")
-hs3 = THStack("hs3",level+title+" after Lepton veto; #slash{E}_{T} (GeV); Events / 40 GeV")
-hs4 = THStack("hs3",level+title+" after Lepton veto; #Delta#Phi; Events / 0.2")
+	bjeteta_list[j] = bjeteta.Clone()
+	del bjeteta
+
+hs = THStack("hs",level+title+" before selection; ; Events / 40 GeV")
+hs2 = THStack("hs2",level+title+" after selection; ; Events / 40 GeV")
+hs3 = THStack("hs3",level+title+" after Lepton veto;; Events / 40 GeV")
+hs4 = THStack("hs4",level+title+" after Lepton veto;; Events / 0.2")
+hs5 = THStack("hs5",level+title+" B Jet #Eta;; Events / 0.2")
 
 stack1_leg = TLegend(.70, .65, .88, .85)
 stack1_leg.SetBorderSize(0)
@@ -74,22 +83,28 @@ stack3_leg.AddEntry(after_lept[0], name_list[0], "l")
 stack4_leg = TLegend(.70, .65, .88, .85)
 stack4_leg.SetBorderSize(0)
 stack4_leg.AddEntry(mindphi_lept[0], name_list[0], "l")
+stack5_leg = TLegend(.70, .65, .88, .85)
+stack5_leg.SetBorderSize(0)
+stack5_leg.AddEntry(bjeteta_list[0], name_list[0], "l")
 
 hist_list[0].SetLineColor(1)
 final_list[0].SetLineColor(1)
 after_lept[0].SetLineColor(1)
 mindphi_lept[0].SetLineColor(1)
+bjeteta_list[0].SetLineColor(1)
 
 hist_list[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 final_list[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 after_lept[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 mindphi_lept[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
+bjeteta_list[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 
 #Ratioplots ttDM
 ratio1 = hist_list[0].Clone()
 ratio2 = final_list[0].Clone()
 ratio3 = after_lept[0].Clone()
 ratio4 = mindphi_lept[0].Clone()
+ratio5 = bjeteta_list[0].Clone()
 
 for i in range(1, len(hist_list)):
 	hist_list[i].SetFillColor(color_list[i])
@@ -116,18 +131,26 @@ for i in range(1, len(hist_list)):
 	stack4_leg.AddEntry(mindphi_lept[i], name_list[i], "f")
 	hs4.Add(mindphi_lept[i])
 
+	bjeteta_list[i].SetFillColor(color_list[i])
+	bjeteta_list[i].SetLineColor(color_list[i])
+	bjeteta_list[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
+	stack4_leg.AddEntry(bjeteta_list[i], name_list[i], "f")
+	hs4.Add(bjeteta_list[i])
+
 	if i == 1:
 		#Ratioplots topDM, summing up below
 		ratio_hist1 = hist_list[1].Clone()
 		ratio_hist2 = final_list[1].Clone()
 		ratio_hist3 = after_lept[1].Clone()
 		ratio_hist4 = mindphi_lept[1].Clone()
+		ratio_hist5 = bjeteta_list[1].Clone()
 
 	else:
 		ratio_hist1.Add(hist_list[i])
 		ratio_hist2.Add(final_list[i])
 		ratio_hist3.Add(after_lept[i])
 		ratio_hist4.Add(mindphi_lept[i])
+		ratio_hist5.Add(bjeteta_list[i])
 
 
 c1.cd()
@@ -150,9 +173,20 @@ stack1_leg.Draw("same")
 low_pad1.cd()
 ratio1.Divide(ratio_hist1)
 ratio1.Draw("hist")
+gStyle.SetOptStat(0)
 
+#Works for png
+ratio1.SetTitle(";#slash{E}_{T} (GeV); ttDM / topDM")
+ratio1.GetXaxis().SetLabelSize(.09)
+ratio1.GetXaxis().SetTitleSize(ratio1.GetXaxis().GetTitleSize()*3)
+ratio1.GetXaxis().SetTitleOffset(.8)
+ratio1.GetYaxis().SetLabelSize(.09)
+ratio1.GetYaxis().SetTitleSize(ratio1.GetYaxis().GetTitleSize()*2.25)
+ratio1.GetYaxis().SetTitleOffset(.425)
+gPad.SetBottomMargin(0.2)
 
 c1.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_Pre_Selection.pdf")
+
 
 c2.cd()
 up_pad2.Draw()
@@ -169,6 +203,7 @@ if final_list[0].GetMaximum() > hs2_max:
 
 hs2.GetXaxis().SetRangeUser(0, 640)
 hs2.SetMaximum(hs2_max*1.1)
+hs2.SetMinimum(1e-2)
 
 stack2_leg.Draw("same")
 
@@ -176,6 +211,17 @@ low_pad2.cd()
 ratio2.Divide(ratio_hist2)
 ratio2.Draw("hist")
 ratio2.GetXaxis().SetRangeUser(0, 640)
+gStyle.SetOptStat(0)
+
+#Works for png
+ratio2.SetTitle(";#slash{E}_{T} (GeV); ttDM / topDM")
+ratio2.GetXaxis().SetLabelSize(.09)
+ratio2.GetXaxis().SetTitleSize(ratio2.GetXaxis().GetTitleSize()*3)
+ratio2.GetXaxis().SetTitleOffset(.8)
+ratio2.GetYaxis().SetLabelSize(.09)
+ratio2.GetYaxis().SetTitleSize(ratio2.GetYaxis().GetTitleSize()*2.25)
+ratio2.GetYaxis().SetTitleOffset(.425)
+gPad.SetBottomMargin(0.2)
 
 c2.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_ Post_Selection.pdf")
 
@@ -195,6 +241,7 @@ if after_lept[0].GetMaximum() > hs3_max:
 
 hs3.GetXaxis().SetRangeUser(0, 500)
 hs3.SetMaximum(hs3_max*1.1)
+hs3.SetMinimum(1e-1)
 
 stack3_leg.Draw("same")
 
@@ -202,8 +249,20 @@ low_pad3.cd()
 ratio3.Divide(ratio_hist3)
 ratio3.Draw("hist")
 ratio3.GetXaxis().SetRangeUser(0, 500)
+gStyle.SetOptStat(0)
+
+#Works for png
+ratio3.SetTitle("; #slash{E}_{T} (GeV); ttDM / topDM")
+ratio3.GetXaxis().SetLabelSize(.09)
+ratio3.GetXaxis().SetTitleSize(ratio3.GetXaxis().GetTitleSize()*3)
+ratio3.GetXaxis().SetTitleOffset(.8)
+ratio3.GetYaxis().SetLabelSize(.09)
+ratio3.GetYaxis().SetTitleSize(ratio3.GetYaxis().GetTitleSize()*2.25)
+ratio3.GetYaxis().SetTitleOffset(.425)
+gPad.SetBottomMargin(0.2)
 
 c3.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_After_Lepton.pdf")
+
 
 c4.cd()
 up_pad4.Draw()
@@ -229,13 +288,50 @@ ratio4.Draw("hist")
 ratio4.GetXaxis().SetRangeUser(0, mt.pi)
 gStyle.SetOptStat(0)
 
-ratio4.SetTitle(";Min#Delta#Phi; ttDM / topDM")
+#Works for png
+ratio4.SetTitle(";Min#Delta#Phi between #slash{E}_{T} and ; ttDM / topDM")
 ratio4.GetXaxis().SetLabelSize(.09)
 ratio4.GetXaxis().SetTitleSize(ratio4.GetXaxis().GetTitleSize()*3)
 ratio4.GetXaxis().SetTitleOffset(.8)
 ratio4.GetYaxis().SetLabelSize(.09)
 ratio4.GetYaxis().SetTitleSize(ratio4.GetYaxis().GetTitleSize()*2.25)
 ratio4.GetYaxis().SetTitleOffset(.425)
-gPad.SetBottomMargin(0.3)
+gPad.SetBottomMargin(0.2)
 
 c4.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_Phi_After_Lepton.pdf")
+c4.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_Phi_After_Lepton.png")
+
+c5.cd()
+up_pad5.Draw()
+low_pad5.Draw()
+
+up_pad5.cd()
+hs5.Draw("hist")
+bjeteta_list[0].Draw("histsame")
+gPad.SetLogy()
+
+hs_max = hs5.GetMaximum()
+if bjeteta_list[0].GetMaximum() > hs_max:
+	hs_max = bjeteta_list[0].GetMaximum()
+
+hs5.SetMaximum(hs_max*1.1)
+
+stack5_leg.Draw("same")
+
+low_pad5.cd()
+ratio5.Divide(ratio_hist5)
+ratio5.Draw("hist")
+gStyle.SetOptStat(0)
+
+#Works for png
+ratio5.SetTitle(";P_{t} Leading BJet #Eta; ttDM / topDM")
+ratio5.GetXaxis().SetLabelSize(.09)
+ratio5.GetXaxis().SetTitleSize(ratio5.GetXaxis().GetTitleSize()*3)
+ratio5.GetXaxis().SetTitleOffset(.8)
+ratio5.GetYaxis().SetLabelSize(.09)
+ratio5.GetYaxis().SetTitleSize(ratio5.GetYaxis().GetTitleSize()*2.25)
+ratio5.GetYaxis().SetTitleOffset(.425)
+gPad.SetBottomMargin(0.2)
+
+c5.Print("./images/"+type1+"/Stack_Plots/"+argv_list[0][5:-5]+"_Stack_BJet_Eta.pdf")
+
