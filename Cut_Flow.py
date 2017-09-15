@@ -62,7 +62,7 @@ if hist_list[0].GetMaximum() > hs_max:
 	hs_max = hist_list[0].GetMaximum()
 
 hs.SetMaximum(hs_max*1.2)
-hs.SetMinimum(10e-1)
+hs.SetMinimum(1e-1)
 gPad.SetLogy()
 
 stack1_leg.Draw("same")

@@ -11,7 +11,6 @@ c2 = TCanvas("canvas2", "Test", 800, 600)
 c3 = TCanvas("canvas3", "Test", 800, 600)
 c4 = TCanvas("canvas4", "Test", 800, 600)
 c5 = TCanvas("canvas5", "Test", 800, 600)
-c6 = TCanvas("canvas6", "Test", 800, 600)
 
 pad_thresh = .2325
 up_pad1 = TPad("upperPad1", "Name", .005, pad_thresh, .995, .995)
@@ -20,19 +19,16 @@ up_pad2 = TPad("upperPad2", "Name", .005, pad_thresh, .995, .995)
 low_pad2 = TPad("lowerPad2", "Name", .005, .005, .995, pad_thresh+.07)
 up_pad3 = TPad("upperPad3", "Name", .005, pad_thresh, .995, .995)
 low_pad3 = TPad("lowerPad3", "Name", .005, .005, .995, pad_thresh+.07)
-up_pad4 = TPad("upperPad4", "Name", .005, pad_thresh, .995, .995)
+"""up_pad4 = TPad("upperPad4", "Name", .005, pad_thresh, .995, .995)
 low_pad4 = TPad("lowerPad4", "Name", .005, .005, .995, pad_thresh+.07)
 up_pad5 = TPad("upperPad5", "Name", .005, pad_thresh, .995, .995)
-low_pad5 = TPad("lowerPad5", "Name", .005, .005, .995, pad_thresh+.07)
-up_pad6 = TPad("upperPad6", "Name", .005, pad_thresh, .995, .995)
-low_pad6 = TPad("lowerPad6", "Name", .005, .005, .995, pad_thresh+.07)
+low_pad5 = TPad("lowerPad5", "Name", .005, .005, .995, pad_thresh+.07)"""
 
 cut1 = [0, 0, 0, 0]
 cut2 = [0, 0, 0, 0]
 cut3 = [0, 0, 0, 0]
 cut4 = [0, 0, 0, 0]
 cut5 = [0, 0, 0, 0]
-cut6 = [0, 0, 0, 0]
 
 file_list = [0, 0, 0, 0]
 scale_dict = {"ttDM_Mchi1Mphi10": 19.76, "topDM_Mchi1Mphi10_sChan_4F": 7.03e-2, "topDM_Mchi1Mphi10_tChan_4F": 27.18e-1, "topDM_Mchi1Mphi10_tWChan_5F": 73.25e-2}
@@ -58,27 +54,23 @@ for j in range(0, len(cut1)):
 	cut1[j] = met_incl.Clone()
 	del met_incl	
 
-	cut2[j] = leptons.Clone()
-	del leptons
+	cut2[j] = met_lept.Clone()
+	del met_lept
 
-	cut3[j] = met_jet.Clone()
+	"""cut3[j] = met_jet.Clone()
 	del met_jet	
 
 	cut4[j] = met_bjet.Clone()
-	del met_bjet	
+	del met_bjet"""	
 
-	cut5[j] = mindphi.Clone()	
-	del mindphi
-
-	cut6[j] = met_sel.Clone()	
-	del met_sel
+	cut3[j] = mindphi_sel.Clone()	
+	del mindphi_sel
 
 hs = THStack("hs",level+title+" No Cuts; ; Events / 40 GeV")
 hs2 = THStack("hs2",level+title+" Lepton veto; ; Events / 40 GeV")
-hs3 = THStack("hs3",level+title+" Njets >= 4; ; Events / 40 GeV")
-hs4 = THStack("hs4",level+title+" Nbjets >= 2;; Events / 40 GeV")
-hs5 = THStack("hs5",level+title+" min#Delta#Phi > 1;; Events / 40 GeV")
-hs6 = THStack("hs6",level+title+" MET > 200 GeV;; Events / 40 GeV")
+hs3 = THStack("hs3",level+title+" min#Delta#Phi > 1; ; Events / 40 GeV")
+"""hs4 = THStack("hs4",level+title+" Nbjets >= 2;; Events / 40 GeV")
+hs5 = THStack("hs5",level+title+" Njets >= 4;; Events / 40 GeV")"""
 
 stack1_leg = TLegend(.70, .65, .88, .85)
 stack1_leg.SetBorderSize(0)
@@ -89,37 +81,31 @@ stack2_leg.AddEntry(cut2[0], name_list[0], "l")
 stack3_leg = TLegend(.70, .65, .88, .85)
 stack3_leg.SetBorderSize(0)
 stack3_leg.AddEntry(cut3[0], name_list[0], "l")
-stack4_leg = TLegend(.70, .65, .88, .85)
+""""stack4_leg = TLegend(.70, .65, .88, .85)
 stack4_leg.SetBorderSize(0)
 stack4_leg.AddEntry(cut4[0], name_list[0], "l")
 stack5_leg = TLegend(.70, .65, .88, .85)
 stack5_leg.SetBorderSize(0)
-stack5_leg.AddEntry(cut5[0], name_list[0], "l")
-stack6_leg = TLegend(.70, .65, .88, .85)
-stack6_leg.SetBorderSize(0)
-stack6_leg.AddEntry(cut6[0], name_list[0], "l")
+stack5_leg.AddEntry(cut5[0], name_list[0], "l")"""
 
 cut1[0].SetLineColor(1)
 cut2[0].SetLineColor(1)
 cut3[0].SetLineColor(1)
-cut4[0].SetLineColor(1)
-cut5[0].SetLineColor(1)
-cut6[0].SetLineColor(1)
+"""cut4[0].SetLineColor(1)
+cut5[0].SetLineColor(1)"""
 
 cut1[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 cut2[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
 cut3[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
-cut4[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
-cut5[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
-cut6[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
+"""cut4[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)
+cut5[0].Scale(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)"""
 
 #Ratioplots ttDM
 ratio1 = cut1[0].Clone()
 ratio2 = cut2[0].Clone()
 ratio3 = cut3[0].Clone()
-ratio4 = cut4[0].Clone()
-ratio5 = cut5[0].Clone()
-ratio6 = cut6[0].Clone()
+"""ratio4 = cut4[0].Clone()
+ratio5 = cut5[0].Clone()"""
 
 for i in range(1, len(cut1)):
 	cut1[i].SetFillColor(color_list[i])
@@ -140,7 +126,7 @@ for i in range(1, len(cut1)):
 	stack3_leg.AddEntry(cut3[i], name_list[i], "f")
 	hs3.Add(cut3[i])
 
-	cut4[i].SetFillColor(color_list[i])
+	"""cut4[i].SetFillColor(color_list[i])
 	cut4[i].SetLineColor(color_list[i])
 	cut4[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
 	stack4_leg.AddEntry(cut4[i], name_list[i], "f")
@@ -150,13 +136,7 @@ for i in range(1, len(cut1)):
 	cut5[i].SetLineColor(color_list[i])
 	cut5[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
 	stack5_leg.AddEntry(cut5[i], name_list[i], "f")
-	hs5.Add(cut5[i])
-
-	cut6[i].SetFillColor(color_list[i])
-	cut6[i].SetLineColor(color_list[i])
-	cut6[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
-	stack6_leg.AddEntry(cut6[i], name_list[i], "f")
-	hs6.Add(cut6[i])
+	hs5.Add(cut5[i])"""
 
 
 	if i == 1:
@@ -164,18 +144,15 @@ for i in range(1, len(cut1)):
 		ratio_hist1 = cut1[1].Clone()
 		ratio_hist2 = cut2[1].Clone()
 		ratio_hist3 = cut3[1].Clone()
-		ratio_hist4 = cut4[1].Clone()
-		ratio_hist5 = cut5[1].Clone()
-		ratio_hist6 = cut6[1].Clone()
+		"""ratio_hist4 = cut4[1].Clone()
+		ratio_hist5 = cut5[1].Clone()"""
 
 	else:
 		ratio_hist1.Add(cut1[i])
 		ratio_hist2.Add(cut2[i])
 		ratio_hist3.Add(cut3[i])
-		ratio_hist4.Add(cut4[i])
-		ratio_hist5.Add(cut5[i])
-		ratio_hist6.Add(cut6[i])
-
+		"""ratio_hist4.Add(cut4[i])
+		ratio_hist5.Add(cut5[i])"""
 
 c1.cd()
 up_pad1.Draw()
@@ -210,7 +187,7 @@ ratio1.GetYaxis().SetTitleSize(ratio1.GetYaxis().GetTitleSize()*2.25)
 ratio1.GetYaxis().SetTitleOffset(.425)
 gPad.SetBottomMargin(0.2)
 
-c1.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut1.pdf")
+c1.Print("./images/"+type1+"/Met_Flow/"+argv_list[0][5:-5]+"_Cut1.pdf")
 
 
 c2.cd()
@@ -246,7 +223,7 @@ ratio2.GetYaxis().SetTitleSize(ratio2.GetYaxis().GetTitleSize()*2.25)
 ratio2.GetYaxis().SetTitleOffset(.425)
 gPad.SetBottomMargin(0.2)
 
-c2.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut2.pdf")
+c2.Print("./images/"+type1+"/Met_Flow/"+argv_list[0][5:-5]+"_Cut2.pdf")
 
 c3.cd()
 up_pad3.Draw()
@@ -281,9 +258,9 @@ ratio3.GetYaxis().SetTitleSize(ratio3.GetYaxis().GetTitleSize()*2.25)
 ratio3.GetYaxis().SetTitleOffset(.425)
 gPad.SetBottomMargin(0.2)
 
-c3.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut3.pdf")
+c3.Print("./images/"+type1+"/Met_Flow/"+argv_list[0][5:-5]+"_Cut3.pdf")
 
-c4.cd()
+"""c4.cd()
 up_pad4.Draw()
 low_pad4.Draw()
 
@@ -316,7 +293,7 @@ ratio4.GetYaxis().SetTitleSize(ratio4.GetYaxis().GetTitleSize()*2.25)
 ratio4.GetYaxis().SetTitleOffset(.425)
 gPad.SetBottomMargin(0.2)
 
-c4.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut4.pdf")
+c4.Print("./images/"+type1+"/Met_Flow/"+argv_list[0][5:-5]+"_Cut4.pdf")
 
 c5.cd()
 up_pad5.Draw()
@@ -353,38 +330,9 @@ gPad.SetBottomMargin(0.2)
 
 c5.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut5.pdf")
 
-c6.cd()
-up_pad6.Draw()
-low_pad6.Draw()
+ratio5.GetXaxis().SetRangeUser(200, 1200)
+up_pad5.cd()
+hs5.GetXaxis().SetRangeUser(200, 1200)
+hs5.SetMaximum(16)
 
-up_pad6.cd()
-hs6.Draw("hist")
-cut6[0].Draw("histsame")
-gPad.SetLogy()
-
-hs_max = hs6.GetMaximum()
-if cut6[0].GetMaximum() > hs_max:
-	hs_max = cut6[0].GetMaximum()
-
-hs6.SetMaximum(hs_max*1.1)
-hs6.SetMinimum(1e-2)
-
-stack6_leg.Draw("same")
-
-low_pad6.cd()
-ratio6.Divide(ratio_hist6)
-ratio6.Draw("hist")
-gStyle.SetOptStat(0)
-
-#Works for png
-ratio6.SetTitle(";#slash{E}_{T} (GeV); ttDM / topDM")
-ratio6.GetXaxis().SetLabelSize(.09)
-ratio6.GetXaxis().SetTitleSize(ratio6.GetXaxis().GetTitleSize()*3)
-ratio6.GetXaxis().SetTitleOffset(.8)
-ratio6.GetYaxis().SetLabelSize(.09)
-ratio6.GetYaxis().SetTitleSize(ratio6.GetYaxis().GetTitleSize()*2.25)
-ratio6.GetYaxis().SetTitleOffset(.425)
-gPad.SetBottomMargin(0.2)
-
-c6.Print("./images/"+type1+"/Stack_Plots/Met_Flow/"+argv_list[0][5:-5]+"_Cut6.pdf")
-
+c5.Print("./images/"+type1+"/Met_Flow/Test.pdf")"""
