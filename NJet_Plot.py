@@ -7,13 +7,20 @@ from array import array
 color_list = [1, 633, 434, 402, 877, 419, 396, 628, 618, 882, 428, 612, 414, 596]
 
 canvas1 = TCanvas("canvas1", "Test", 800, 600)
-stack_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-stack_leg_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+pad_thresh = .2325
+up_pad = TPad("upperPad", "Name", .005, pad_thresh, .995, .995)
+low_pad = TPad("lowerPad", "Name", .005, .01, .995, pad_thresh+.075)
+up_pad.Draw()
+low_pad.Draw()
+canvas2 = TCanvas("canvas2", "Test", 800, 600)
+
+stack_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ]
+stack_leg_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 select_list = [" after lepton veto", " after min#Delta#Phi selection", " after #slash{E}_{t} selection"]
 select_print = ["Lept_vet", "MindPhi_sel", "MET_sel"]
 axis_list = ["Number of jets", "Number of b-jets", "P_{t} (Leading Jet)", "P_{t} (Leading B-Jet)", "#Delta#Phi (MET, Leading b jet)"]
-axis_print = ["Njets", "NBjets", "Jet1Pt", "BJet1Pt", "DPhi_MET_BJet"]
+axis_print = ["Njets", "NBjets", "Jet1Pt", "BJet1Pt", "DPhi_MET_BJet", "Jet1_Eta", "BJet1_Eta"]
 
 n_jet_lept = [0, 0, 0, 0]
 n_jet_mindphi = [0, 0, 0, 0]
@@ -35,8 +42,12 @@ met_vs_jet_list = [0, 0, 0, 0]
 met_vs_bjet_list = [0, 0, 0, 0]
 top_list = [0, 0]
 
+jet_eta = [0]*4
+bjet_eta = [0]*4
 
-plot_list = [n_jet_lept, n_jet_mindphi, n_jet_met, n_bjet_lept, n_bjet_mindphi, n_bjet_met, jet_lept, jet_mindphi, jet_met, bjet_lept, bjet_mindphi, bjet_met, dphi_metbjet]
+
+plot_list = [n_jet_lept, n_jet_mindphi, n_jet_met, n_bjet_lept, n_bjet_mindphi, n_bjet_met, jet_lept, jet_mindphi, jet_met, bjet_lept, bjet_mindphi, bjet_met, dphi_metbjet, jet_eta, bjet_eta]
+ratio_list = [0]*len(plot_list)
 
 file_list = [0, 0, 0, 0]
 
@@ -57,8 +68,10 @@ for i in range(0, len(stack_list)):
 	axis = axis_list[int(i/3.)]
 	if i == 12:
 		selection = select_list[2]
+	if i == 13 or i == 14:
+		selection = select_list[0]
 	stack_list[i] = THStack("hs"+str(i),title+selection+";"+axis+" ; Events / 40 GeV")
-	stack_leg_list[i] = TLegend(.70, .65, .88, .85)
+	stack_leg_list[i] = TLegend(.77, .68, .88, .88)
 	stack_leg_list[i].SetBorderSize(0)
 
 
@@ -85,15 +98,18 @@ for i in range(0, len(file_list)):
 	dphi_metbjet[i] = dphi_met_bjet.Clone()
 	met_vs_jet_list[i] = met_jet1pt.Clone()
 	met_vs_bjet_list[i] = met_bjet1pt.Clone()
+	
+	jet_eta[i] = jet1pt_eta.Clone()
+	bjet_eta[i] = bjet1pt_eta.Clone()
 
 
 	met_vs_jet_list[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
 	met_vs_bjet_list[i].Scale(scale_dict[argv_list[i][:-14]]/n_events[i]*2.2e3)
 
-	del njet_lept, njet_mindphi, njet_met, nbjet_lept, nbjet_mindphi, nbjet_met, jet1pt_lept, jet1pt_mindphi, jet1pt_met, bjet1pt_lept, bjet1pt_mindphi, bjet1pt_met, dphi_met_bjet, met_jet1pt, met_bjet1pt
+	del njet_lept, njet_mindphi, njet_met, nbjet_lept, nbjet_mindphi, nbjet_met, jet1pt_lept, jet1pt_mindphi, jet1pt_met, bjet1pt_lept, bjet1pt_mindphi, bjet1pt_met, dphi_met_bjet, met_jet1pt, met_bjet1pt, jet1pt_eta, bjet1pt_eta
 
-jet_range = [3, 7] #Adjust jet range for cut scenario testing
-jetb_range = [0, 3]
+jet_range = [0, 12] #Adjust jet range for cut scenario testing
+jetb_range = [0, 8]
 
 stack_bin = [0]*jet_range[1]
 tt_bin  = [0]*jet_range[1]
@@ -112,6 +128,11 @@ for i in range(0, len(n_jet_lept)):
 		else:
 			stack_leg_list[j].AddEntry(plot_list[j][i], name_list[i], "f")
 			stack_list[j].Add(plot_list[j][i])
+			if i == 1:
+				ratio_list[j] = plot_list[j][i]
+			else:
+				ratio_list[j].Add(plot_list[j][i])	
+
 			plot_list[j][i].SetFillColor(color_list[i])
 			if j == 2:	#Jet_Met after full selection
 				for k in range(jet_range[0], jet_range[1]):		#Choose range for Jet Comparison
@@ -130,14 +151,22 @@ gPad.SetLogy()
 gStyle.SetOptStat(0)	#hide statbox
 
 for i in range(0, len(plot_list)):
+	up_pad.cd()
 	axis = axis_print[int(i/3.)]
 	select = select_print[i % 3]
 
 	if i == 12:
 		select = select_print[2]
 		axis = axis_print[4]
+	if i == 13:
+		select = select_print[0]
+		axis = axis_print[5]
+	if i == 14:
+		select = select_print[0]
+		axis = axis_print[6]
 		
 	stack_list[i].Draw("hist")
+	gPad.SetLogy()
 	plot_list[i][0].Draw("histsame")
 	stack_leg_list[i].Draw("same")
 
@@ -148,19 +177,32 @@ for i in range(0, len(plot_list)):
 	stack_list[i].SetMaximum(hs_max)
 	stack_list[i].SetMinimum(1e-2)
 
+	low_pad.cd()
+	ratio = plot_list[i][0].Clone()
+	ratio.Divide(ratio_list[i])
+	ratio.Draw("hist")
+	gPad.SetLogy()
+	ratio.GetXaxis().SetLabelSize(.1)
+	ratio.GetYaxis().SetLabelSize(.09)
+	ratio.GetYaxis().SetTitleSize(ratio.GetYaxis().GetTitleSize()*2.5)
+	ratio.GetXaxis().SetTitleSize(ratio.GetXaxis().GetTitleSize()*2.5)
+	ratio.GetYaxis().SetTitleOffset(.35)
+	ratio.GetXaxis().SetTitleOffset(1.)
+	gPad.SetBottomMargin(0.2)
+
 	canvas1.Print("./images/Hadronic/Jet_Plots/"+axis+"/"+title+"_"+axis+"_"+select+".pdf")
 
-	del hs_max
+	del hs_max, ratio
 
 for i in range(0, len(bin_comparison)):
 	if abs(stack_bin[i]+tt_bin[i]) > 0:
 		#if abs((stack_bin[i]-tt_bin[i])/(stack_bin[i]+tt_bin[i])) < 1:
 		bin_comparison[i] = abs((stack_bin[i]-tt_bin[i])/(stack_bin[i]+tt_bin[i]))
 	if abs(stack_bin_b[i]+tt_bin_b[i]) > 0:
-		if abs((stack_bin_b[i]-tt_bin_b[i])/(stack_bin_b[i]+tt_bin_b[i])) < 1:
-			bin_comparison_b[i] = abs((stack_bin_b[i]-tt_bin_b[i])/(stack_bin_b[i]+tt_bin_b[i]))
+		#if abs((stack_bin_b[i]-tt_bin_b[i])/(stack_bin_b[i]+tt_bin_b[i])) < 1:
+		bin_comparison_b[i] = abs((stack_bin_b[i]-tt_bin_b[i])/(stack_bin_b[i]+tt_bin_b[i]))
 
-indices = [i for i,x in enumerate(bin_comparison) if x == max(bin_comparison)]
+"""indices = [i for i,x in enumerate(bin_comparison) if x == max(bin_comparison)]
 print "\nMax difference between tt and top in range ["+str(jet_range[0])+","+str(jet_range[1]-1)+"] Jets: \n# of Jets: ", indices[0]+1, " Bin_Value: ", bin_comparison[indices[0]] 
 
 indices_b = [i for i,x in enumerate(bin_comparison_b) if x == max(bin_comparison_b)]
@@ -169,7 +211,23 @@ print "\nMax difference between tt and top in range ["+str(jetb_range[0])+","+st
 k = plot_list[2][0].Integral()
 print "Ratio of cut events to initial events: ", k/(scale_dict[argv_list[0][:-14]]/n_events[0]*2.2e3)/n_events[0], "\n"
 
+bin_comparison_hist = TH1F("comp", "Bin Comparison Jets; # of Jets; Comp Value", len(bin_comparison), 0, len(bin_comparison))
+bin_comparison_b_hist = TH1F("compb", "Bin Comparison B Jets; # of B Jets; Comp Value", len(bin_comparison_b), 0, len(bin_comparison_b))
+
+for i in range(0, len(bin_comparison)):
+	bin_comparison_hist.Fill(i, bin_comparison[i])
+bin_comparison_hist.Draw("hist")
+canvas1.Print("./images/Hadronic/Jet_Plots/Bin_Comparison_Jets.pdf")
+
+print bin_comparison_b
+
+for i in range(0, len(bin_comparison_b)):
+	bin_comparison_b_hist.Fill(i, bin_comparison_b[i])
+bin_comparison_b_hist.Draw("hist")
+canvas1.Print("./images/Hadronic/Jet_Plots/Bin_Comparison_BJets.pdf")"""
+
 def print_2D(histo, interaction_type, variable):
+	canvas2.cd()
 	histo.Draw("colz")
 	histo.SetTitle(interaction_type+" "+title+"; P_{t} (Leading "+variable+");#slash{E}_{t} / 20 GeV")
 	histo.GetXaxis().SetTitleOffset(1.2)
@@ -177,10 +235,8 @@ def print_2D(histo, interaction_type, variable):
 	histo.GetZaxis().SetTickSize(.01)
 	gPad.SetLogz()
 	gPad.SetLogy(False)
-	canvas1.Update()	
-	palette = histo.GetListOfFunctions().FindObject("palette")
-	palette.SetX2NDC(.93)
-	canvas1.Print("./images/Hadronic/Jet_Plots/2D_Plots/"+interaction_type+"_"+title+"_MET_"+variable+"Pt.pdf")
+	canvas2.Update()	
+	canvas2.Print("./images/Hadronic/Jet_Plots/2D_Plots/"+interaction_type+"_"+title+"_MET_"+variable+"Pt.pdf")
 
 for j in range(1, 4):
 	if j == 1:

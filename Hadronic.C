@@ -24,6 +24,49 @@ void Hadronic::Loop()
 	Float_t met_test = 0;
 	UInt_t csv = 0;
 	Int_t n_event = 0;
+
+/*
+	Int_t jeq3_beq1 = 0;
+	Int_t jeq3_beq2 = 0;
+	Int_t jeq3_bgeq1 = 0;
+	Int_t jeq3_bgeq2 = 0;
+
+	Int_t jgeq3_beq1 = 0;
+	Int_t jgeq3_beq2 = 0;
+	Int_t jgeq3_bgeq1 = 0;
+	Int_t jgeq3_bgeq2 = 0;
+
+
+	Int_t jeq4_beq1 = 0;
+	Int_t jeq4_beq2 = 0;
+	Int_t jeq4_bgeq1 = 0;
+	Int_t jeq4_bgeq2 = 0;
+
+	Int_t jgeq4_beq1 = 0;
+	Int_t jgeq4_beq2 = 0;
+	Int_t jgeq4_bgeq1 = 0;
+	Int_t jgeq4_bgeq2 = 0;
+
+	Int_t jeq5_beq1 = 0;
+	Int_t jeq5_beq2 = 0;
+	Int_t jeq5_bgeq1 = 0;
+	Int_t jeq5_bgeq2 = 0;
+
+	Int_t jgeq5_beq1 = 0;
+	Int_t jgeq5_beq2 = 0;
+	Int_t jgeq5_bgeq1 = 0;
+	Int_t jgeq5_bgeq2 = 0;
+
+	Int_t jeq6_beq1 = 0;
+	Int_t jeq6_beq2 = 0;
+	Int_t jeq6_bgeq1 = 0;
+	Int_t jeq6_bgeq2 = 0;
+
+	Int_t jgeq6_beq1 = 0;
+	Int_t jgeq6_beq2 = 0;
+	Int_t jgeq6_bgeq1 = 0;
+	Int_t jgeq6_bgeq2 = 0;
+*/
 	   
 	//prints number or tree entries
 	cout << "Entries " << nentries << endl;
@@ -61,6 +104,9 @@ void Hadronic::Loop()
 
 	TH1F *h_mindphi = new TH1F("mindphi",";min#Delta#Phi (Jets, MET);Events / 0.2;log",20,0,4); h_mindphi->Sumw2();
 	TH1F *h_dphi_met_bjet = new TH1F("dphi_met_bjet",";#Delta#Phi (MET, leading B Jet); Events / 0.2; log",20, 0, 4); h_dphi_met_bjet->Sumw2();
+
+	TH1F *h_jet1pt_eta = new TH1F("jet1pt_eta","; p_{t} (leading jet); Events / 0.2; log",50, -5, 5); h_jet1pt_eta->Sumw2();
+	TH1F *h_bjet1pt_eta = new TH1F("bjet1pt_eta","; p_{t} (leading b jet); Events / 0.2; log",50, -5, 5); h_bjet1pt_eta->Sumw2();
 
 	TH2F *h_met_jet1pt = new TH2F("met_jet1pt","", 35, 30, 730, 25, 0, 500); h_met_jet1pt->Sumw2();
 	TH2F *h_met_bjet1pt = new TH2F("met_bjet1pt", "", 35, 30, 730, 25, 0, 500); h_met_bjet1pt->Sumw2();
@@ -106,9 +152,9 @@ void Hadronic::Loop()
 		//Example of selection applied to the jets
 		//Loop over reconstructed jets 
 		for (Int_t i=0; i < Jet_size; i++)
-			{
+		{
 			//Apply analysis selection to jets. Only jets in the events satisfying the following conditions are considered as jets for the analysis
-			if(std::abs(Jet_Eta[i])<4. && Jet_PT[i]>30) 
+			if(std::abs(Jet_Eta[i])<4. && Jet_PT[i]>30) 	//4
 			{
 				//Increment number of jets found in the events that satisfy the quality selection 
 				n_jet += 1;
@@ -127,7 +173,7 @@ void Hadronic::Loop()
 				//i.e. the first element of the array is the jet in the event with the highest pt
 				if(index_j1==-1) index_j1=i;
 
-				if( std::abs(Jet_Eta[i])<2.4 && std::abs(Jet_BTag[i]==1) ) 
+				if( std::abs(Jet_Eta[i])<2.4 && std::abs(Jet_BTag[i]==1) )  //2.4
 				{
 					//Increment number of jets found in the events that satisfy the quality selection 
 					n_bjet += 1;
@@ -164,12 +210,16 @@ void Hadronic::Loop()
 		h_nbjet_lept->Fill(std::min(float(n_bjet), float(h_nbjet_lept->GetXaxis()->GetXmax()-0.1)), eventweight);	
 		h_jet1pt_lept->Fill(std::min(float(Jet_PT[index_j1]), float(h_jet1pt_lept->GetXaxis()->GetXmax()-0.1)), eventweight);
 		h_bjet1pt_lept->Fill(std::min(float(Jet_PT[index_j1]), float(h_bjet1pt_lept->GetXaxis()->GetXmax()-0.1)), eventweight);
+		
+		if( n_jet > 0) h_jet1pt_eta->Fill(std::min(float(Jet_Eta[index_j1]), float(h_jet1pt_eta->GetXaxis()->GetXmax()-0.1)), eventweight);
+		if( n_bjet > 0) h_bjet1pt_eta->Fill(std::min(float(Jet_Eta[index_bj1]), float(h_bjet1pt_eta->GetXaxis()->GetXmax()-0.1)), eventweight);
+		
 
 		//Fill histograms - #jets selection
-		if( !(n_jet > 2) ) continue;
+		//if( !(n_jet == 3) ) continue;
 
 		//Fill histograms - #jets selection
-		if( !(n_bjet > 1) ) continue;
+		//if( !(n_bjet > 1) ) continue;
 
 
 		//Fill histograms - mindphi selection
@@ -190,7 +240,6 @@ void Hadronic::Loop()
 		h_events->Fill(3., eventweight);
 		h_met_sel->Fill(std::min(float(met), float(h_met_sel->GetXaxis()->GetXmax()-0.1)), eventweight);
 
-		if( n_jet == 0) printf("%i\n", 1);
 		h_njet_met->Fill(std::min(float(n_jet), float(h_njet_met->GetXaxis()->GetXmax()-0.1)), eventweight);	
 		h_nbjet_met->Fill(std::min(float(n_bjet), float(h_nbjet_met->GetXaxis()->GetXmax()-0.1)), eventweight);	
 		h_jet1pt_met->Fill(std::min(float(Jet_PT[index_j1]), float(h_jet1pt_met->GetXaxis()->GetXmax()-0.1)), eventweight);
@@ -200,45 +249,144 @@ void Hadronic::Loop()
 
 		n_event += 1;
 
+/*
+		if( n_jet == 3) 
+		{
+			if( n_bjet == 1) jeq3_beq1 += 1;
+			else if( n_bjet == 2) jeq3_beq2 += 1;
+			if( n_bjet > 0 ) jeq3_bgeq1 += 1;
+			if( n_bjet > 1) jeq3_bgeq2 += 1;
+		}
+		if( n_jet > 2) 
+		{
+			if( n_bjet == 1) jgeq3_beq1 += 1;
+			else if( n_bjet == 2) jgeq3_beq2 += 1;
+			if( n_bjet > 0 ) jgeq3_bgeq1 += 1;
+			if( n_bjet > 1) jgeq3_bgeq2 += 1;
 		}
 
-		Double_t err = 0.;
-		Double_t integral = h_met_sel->IntegralAndError(0,100,err);
+		if( n_jet == 4) 
+		{
+			if( n_bjet == 1) jeq4_beq1 += 1;
+			else if( n_bjet == 2) jeq4_beq2 += 1;
+			if( n_bjet > 0 ) jeq4_bgeq1 += 1;
+			if( n_bjet > 1) jeq4_bgeq2 += 1;
+		}
+		if( n_jet > 3) 
+		{
+			if( n_bjet == 1) jgeq4_beq1 += 1;
+			else if( n_bjet == 2) jgeq4_beq2 += 1;
+			if( n_bjet > 0 ) jgeq4_bgeq1 += 1;
+			if( n_bjet > 1) jgeq4_bgeq2 += 1;
+		}
+		if( n_jet == 5) 
+		{
+			if( n_bjet == 1) jeq5_beq1 += 1;
+			else if( n_bjet == 2) jeq5_beq2 += 1;
+			if( n_bjet > 0 ) jeq5_bgeq1 += 1;
+			if( n_bjet > 1) jeq5_bgeq2 += 1;
+		}
+		if( n_jet > 4) 
+		{
+			if( n_bjet == 1) jgeq5_beq1 += 1;
+			else if( n_bjet == 2) jgeq5_beq2 += 1;
+			if( n_bjet > 0 ) jgeq5_bgeq1 += 1;
+			if( n_bjet > 1) jgeq5_bgeq2 += 1;
+		}
+		if( n_jet == 6) 
+		{
+			if( n_bjet == 1) jeq6_beq1 += 1;
+			else if( n_bjet == 2) jeq6_beq2 += 1;
+			if( n_bjet > 0 ) jeq6_bgeq1 += 1;
+			if( n_bjet > 1) jeq6_bgeq2 += 1;
+		}
+		if( n_jet > 5) 
+		{
+			if( n_bjet == 1) jgeq6_beq1 += 1;
+			else if( n_bjet == 2) jgeq6_beq2 += 1;
+			if( n_bjet > 0 ) jgeq6_bgeq1 += 1;
+			if( n_bjet > 1) jgeq6_bgeq2 += 1;
+		}
+*/
+
+	}
+
+/*	cout << "J = 3, BJ = 1 " << jeq3_beq1 << endl;
+	cout << "J = 3, BJ >= 1 " << jeq3_bgeq1 << endl;
+	cout << "J = 3, BJ = 2 " << jeq3_beq2 << endl;
+	cout << "J = 3, BJ >= 2 " << jeq3_bgeq2 << endl;
+	cout << "J >= 3, BJ = 1 " << jgeq3_beq1 << endl;
+	cout << "J >= 3, BJ >= 1 " << jgeq3_bgeq1 << endl;
+	cout << "J >= 3, BJ = 2 " << jgeq3_beq2 << endl;
+	cout << "J >= 3, BJ >= 2 " << jgeq3_bgeq2 << endl;
+
+	cout << "J = 4, BJ = 1 " << jeq4_beq1 << endl;
+	cout << "J = 4, BJ >= 1 " << jeq4_bgeq1 << endl;
+	cout << "J = 4, BJ = 2 " << jeq4_beq2 << endl;
+	cout << "J = 4, BJ >= 2 " << jeq4_bgeq2 << endl;
+	cout << "J >= 4, BJ = 1 " << jgeq4_beq1 << endl;
+	cout << "J >= 4, BJ >= 1 " << jgeq4_bgeq1 << endl;
+	cout << "J >= 4, BJ = 2 " << jgeq4_beq2 << endl;
+	cout << "J >= 4, BJ >= 2 " << jgeq4_bgeq2 << endl;
+
+	cout << "J = 5, BJ = 1 " << jeq5_beq1 << endl;
+	cout << "J = 5, BJ >= 1 " << jeq5_bgeq1 << endl;
+	cout << "J = 5, BJ = 2 " << jeq5_beq2 << endl;
+	cout << "J = 5, BJ >= 2 " << jeq5_bgeq2 << endl;
+	cout << "J >= 5, BJ = 1 " << jgeq5_beq1 << endl;
+	cout << "J >= 5, BJ >= 1 " << jgeq5_bgeq1 << endl;
+	cout << "J >= 5, BJ = 2 " << jgeq5_beq2 << endl;
+	cout << "J >= 5, BJ >= 2 " << jgeq5_bgeq2 << endl;
+
+	cout << "J = 6, BJ = 1 " << jeq6_beq1 << endl;
+	cout << "J = 6, BJ >= 1 " << jeq6_bgeq1 << endl;
+	cout << "J = 6, BJ = 2 " << jeq6_beq2 << endl;
+	cout << "J = 6, BJ >= 2 " << jeq6_bgeq2 << endl;
+	cout << "J >= 6, BJ = 1 " << jgeq6_beq1 << endl;
+	cout << "J >= 6, BJ >= 1 " << jgeq6_bgeq1 << endl;
+	cout << "J >= 6, BJ = 2 " << jgeq6_beq2 << endl;
+	cout << "J >= 6, BJ >= 2 " << jgeq6_bgeq2 << endl;
+*/
+	Double_t err = 0.;
+	Double_t integral = h_met_sel->IntegralAndError(0,100,err);
 		  
-		//Write the histrograms into a root file
-		TFile *f = new TFile(("./output_root/"+sample+"_Hadronic.root").c_str(),"RECREATE");
-		f->cd();
+	//Write the histrograms into a root file
+	TFile *f = new TFile(("./output_root/"+sample+"_Hadronic.root").c_str(),"RECREATE");
+	f->cd();
 
-		h_events->Write();
+	h_events->Write();
 
-		//Miscellaneous		
-		h_mindphi->Write(); 			
-		h_njet_lept->Write();		
-		h_njet_mindphi->Write();			
-		h_njet_met->Write();
-		h_nbjet_lept->Write();		
-		h_nbjet_mindphi->Write();			
-		h_nbjet_met->Write();	
-		h_dphi_met_bjet->Write();				
+	//Miscellaneous		
+	h_mindphi->Write(); 			
+	h_njet_lept->Write();		
+	h_njet_mindphi->Write();			
+	h_njet_met->Write();
+	h_nbjet_lept->Write();		
+	h_nbjet_mindphi->Write();			
+	h_nbjet_met->Write();	
+	h_dphi_met_bjet->Write();				
 
-		//Leading jets
-		h_jet1pt_lept->Write();	
-		h_jet1pt_mindphi->Write();	
-		h_jet1pt_met->Write();							
-		h_bjet1pt_lept->Write();	
-		h_bjet1pt_mindphi->Write();	
-		h_bjet1pt_met->Write();			
+	//Leading jets
+	h_jet1pt_lept->Write();	
+	h_jet1pt_mindphi->Write();	
+	h_jet1pt_met->Write();							
+	h_bjet1pt_lept->Write();	
+	h_bjet1pt_mindphi->Write();	
+	h_bjet1pt_met->Write();		
+
+	h_jet1pt_eta->Write();
+	h_bjet1pt_eta->Write();	
 		
-		//Met after cuts  
-		h_met_incl->Write();			
-		h_met_lept->Write();			
-		h_mindphi_sel->Write();			
-		h_met_sel->Write();			
+	//Met after cuts  
+	h_met_incl->Write();			
+	h_met_lept->Write();			
+	h_mindphi_sel->Write();			
+	h_met_sel->Write();			
 
-		//2D plots before cuts		 
-		h_met_jet1pt->Write();				
-		h_met_bjet1pt->Write();			
+	//2D plots before cuts		 
+	h_met_jet1pt->Write();				
+	h_met_bjet1pt->Write();			
 
 
-		f->Close();
+	f->Close();
 }

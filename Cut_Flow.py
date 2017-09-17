@@ -50,12 +50,15 @@ for i in range(1, len(hist_list)):
 	stack1_leg.AddEntry(hist_list[i], name_list[i], "f")
 	hs.Add(hist_list[i])
 
+
+
 hs.Draw("hist")
 gPad.Update()
 
 hist_list[0].Scale(scale_dict[argv_list[0][:-14]]/hist_list[0].GetBinContent(1)*2.2e3)
 hist_list[0].Draw("histsame")
 hs.GetXaxis().SetLabelSize(0)
+
 
 hs_max = hs.GetMaximum()
 if hist_list[0].GetMaximum() > hs_max:
